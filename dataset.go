@@ -8,7 +8,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 )
+
+// A Classifier classifies an image (data) as a
+// digit between 0 and 9 (inclusive).
+type Classifier func(data []float64) int
 
 // A Sample is one instance of a handwritten digit.
 type Sample struct {
@@ -90,6 +95,43 @@ func (d DataSet) LabelVectors() [][]float64 {
 		res[i][sample.Label] = 1
 	}
 	return res
+}
+
+// NumCorrect reports the number of samples a
+// Classifier correctly classifies.
+func (d DataSet) NumCorrect(classifier Classifier) int {
+	var count int
+	for _, sample := range d.Samples {
+		c := classifier(sample.Intensities)
+		if c == sample.Label {
+			count++
+		}
+	}
+	return count
+}
+
+// CorrectnessHistogram returns a human-readable
+// string indicating how many of each digit a
+// classifier gets correct.
+// For example, its output might start like
+// "0: 50.25%, 1: 90.32%, 2: 30.15%".
+func (d DataSet) CorrectnessHistorgram(classifier Classifier) string {
+	var correct [10]int
+	var total [10]int
+	for _, sample := range d.Samples {
+		c := classifier(sample.Intensities)
+		if c == sample.Label {
+			correct[sample.Label]++
+		}
+		total[sample.Label]++
+	}
+
+	histogramParts := make([]string, 10)
+	for i := range histogramParts {
+		histogramParts[i] = fmt.Sprintf("%d: %0.2f%%", i,
+			100*float64(correct[i])/float64(total[i]))
+	}
+	return strings.Join(histogramParts, ", ")
 }
 
 func assetReader(name string) io.Reader {
