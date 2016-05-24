@@ -13,26 +13,12 @@ import (
 // A Sample is one instance of a handwritten digit.
 type Sample struct {
 	// Intensities is a bitmap of white-and-black
-	// values, where 0xff is black and 0 is white.
-	//
-	// This is ordered first horizontally, then
-	// vertically, like a traditional bitmap.
-	Intensities []uint8
+	// values, where 1 is black and 0 is white.
+	Intensities []float64
 
 	// Label is a number between 0 and 9 (inclusive)
 	// indicating what digit this is.
 	Label int
-}
-
-// Floats returns a floating-point representation
-// of the vector of intensities, where the max
-// intensity is 1 and the min is 0.
-func (s *Sample) Floats() []float64 {
-	res := make([]float64, len(s.Intensities))
-	for i, x := range s.Intensities {
-		res[i] = float64(x) / 255.0
-	}
-	return res
 }
 
 // A DataSet is a collection of samples.
@@ -69,18 +55,22 @@ func loadDataSet(prefix string) DataSet {
 	dataSet.Height = h
 	dataSet.Samples = make([]Sample, len(intensities))
 	for i := range dataSet.Samples {
-		dataSet.Samples[i].Intensities = intensities[i]
+		floats := make([]float64, len(intensities[i]))
+		for i, x := range intensities[i] {
+			floats[i] = float64(x) / 255.0
+		}
+		dataSet.Samples[i].Intensities = floats
 		dataSet.Samples[i].Label = labels[i]
 	}
 	return dataSet
 }
 
-// FloatVectors returns a slice of intensity float
+// IntensityVectors returns a slice of intensity
 // vectors, one per sample.
 func (d DataSet) FloatVectors() [][]float64 {
 	res := make([][]float64, len(d.Samples))
 	for i, sample := range d.Samples {
-		res[i] = sample.Floats()
+		res[i] = sample.Intensities
 	}
 	return res
 }
