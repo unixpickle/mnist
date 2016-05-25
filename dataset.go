@@ -115,7 +115,7 @@ func (d DataSet) NumCorrect(classifier Classifier) int {
 // classifier gets correct.
 // For example, its output might start like
 // "0: 50.25%, 1: 90.32%, 2: 30.15%".
-func (d DataSet) CorrectnessHistorgram(classifier Classifier) string {
+func (d DataSet) CorrectnessHistogram(classifier Classifier) string {
 	var correct [10]int
 	var total [10]int
 	for _, sample := range d.Samples {
