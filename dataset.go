@@ -72,7 +72,7 @@ func loadDataSet(prefix string) DataSet {
 
 // IntensityVectors returns a slice of intensity
 // vectors, one per sample.
-func (d DataSet) FloatVectors() [][]float64 {
+func (d DataSet) IntensityVectors() [][]float64 {
 	res := make([][]float64, len(d.Samples))
 	for i, sample := range d.Samples {
 		res[i] = sample.Intensities
