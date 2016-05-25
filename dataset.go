@@ -175,8 +175,8 @@ func readIntensities(reader io.Reader) (results [][]uint8, width, height int, er
 		}
 
 		vec := make([]uint8, width*height)
-		for i := range buffer.Bytes() {
-			vec[i] = uint8(i)
+		for i, b := range buffer.Bytes() {
+			vec[i] = uint8(b)
 		}
 		results[j] = vec
 	}
