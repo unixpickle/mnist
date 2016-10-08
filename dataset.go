@@ -9,6 +9,10 @@ import (
 	"fmt"
 	"io"
 	"strings"
+
+	"github.com/unixpickle/num-analysis/linalg"
+	"github.com/unixpickle/sgd"
+	"github.com/unixpickle/weakai/neuralnet"
 )
 
 // A Classifier classifies an image (data) as a
@@ -132,6 +136,24 @@ func (d DataSet) CorrectnessHistogram(classifier Classifier) string {
 			100*float64(correct[i])/float64(total[i]))
 	}
 	return strings.Join(histogramParts, ", ")
+}
+
+// SGDSampleSet creates an sgd.SampleSet full of
+// neuralnet.VectorSample entries.
+// Each entry contains the intensity vector and
+// label vector for a digit.
+func (d DataSet) SGDSampleSet() sgd.SampleSet {
+	labelVecs := d.LabelVectors()
+	inputVecs := d.IntensityVectors()
+	return neuralnet.VectorSampleSet(vecVec(inputVecs), vecVec(labelVecs))
+}
+
+func vecVec(f [][]float64) []linalg.Vector {
+	res := make([]linalg.Vector, len(f))
+	for i, x := range f {
+		res[i] = x
+	}
+	return res
 }
 
 func assetReader(name string) io.Reader {
