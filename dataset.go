@@ -10,6 +10,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/unixpickle/anynet/anyff"
+	"github.com/unixpickle/anyvec"
 	"github.com/unixpickle/num-analysis/linalg"
 	"github.com/unixpickle/sgd"
 	"github.com/unixpickle/weakai/neuralnet"
@@ -146,6 +148,21 @@ func (d DataSet) SGDSampleSet() sgd.SampleSet {
 	labelVecs := d.LabelVectors()
 	inputVecs := d.IntensityVectors()
 	return neuralnet.VectorSampleSet(vecVec(inputVecs), vecVec(labelVecs))
+}
+
+// AnyNetSamples creates an anyff.SampleList.
+// The output vector for each sample is a one-hot encoding
+// of the correct digit.
+func (d DataSet) AnyNetSamples(c anyvec.Creator) anyff.SampleList {
+	var res anyff.SliceSampleList
+	labVec := d.LabelVectors()
+	for i, x := range d.IntensityVectors() {
+		res = append(res, &anyff.Sample{
+			Input:  c.MakeVectorData(c.MakeNumericList(x)),
+			Output: c.MakeVectorData(c.MakeNumericList(labVec[i])),
+		})
+	}
+	return res
 }
 
 func vecVec(f [][]float64) []linalg.Vector {
